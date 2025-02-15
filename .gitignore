@@ -23,7 +23,7 @@ dist-ssr/
 /backend/.env
 
 # Ignore only specific files inside public (but keep the folder)
-frontend/public/product.zip
+frontend/public/
 
 # Editor directories and files
 .vscode/
