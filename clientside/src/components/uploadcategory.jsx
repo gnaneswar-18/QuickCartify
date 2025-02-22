@@ -48,8 +48,8 @@ const UploadCategory = ({ close, fetchcategory }) => {
   };
 
   return (
-    <section className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-      <div className="bg-white max-w-lg w-full p-6 rounded-lg shadow-lg">
+    
+      <section className="bg-white max-w-lg w-full p-6 rounded-lg shadow-lg">
         <div className="flex justify-between items-center border-b pb-3 mb-4">
           <h2 className="text-xl font-bold">Add Category</h2>
           <button onClick={close} className="text-gray-500 hover:text-gray-700">
@@ -96,8 +96,8 @@ const UploadCategory = ({ close, fetchcategory }) => {
             </button>
           </div>
         </form>
-      </div>
-    </section>
+      </section>
+    
   );
 };
 

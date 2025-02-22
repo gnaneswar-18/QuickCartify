@@ -10,18 +10,18 @@ import { useSelector } from 'react-redux';
 const Category = () => {
   const [openuploadcategory, setopnenuploadcategory] = useState(false);
   const [categorydata, setcategorydata] = useState([]);
-  
+
   const [loading, setloading] = useState(false);
   const [openedit, setopenedit] = useState(false);
   const [editcategorydata, seteditcategorydata] = useState({
-    id:"",
-    name:"",
-    image:"",
+    id: "",
+    name: "",
+    image: "",
 
   });
- 
-  const allcategory=useSelector(state=>state.product.allcategory)
-  
+
+  const allcategory = useSelector(state => state.product.allcategory)
+
   useEffect(() => {
     setcategorydata(allcategory);
   }, [allcategory]);
@@ -29,16 +29,16 @@ const Category = () => {
     try {
       const response = await Axios({
         ...summaryapi.deletecategory,
-         data:{id: categoryId}
+        data: { id: categoryId }
       });
       if (response?.data?.success) {
         toast.success(response.data.message);
       }
     } catch (error) {
-     AxiosToastError(error)
+      AxiosToastError(error)
     }
   }
-  
+
   return (
 
     <section className=" overflow-y-auto " style={{ maxHeight: "80vh" }}>
@@ -74,15 +74,17 @@ const Category = () => {
                 <div className="flex gap-2 mt-2 justify-between">
                   <div className="font-medium px-3 py-1 bg-blue-200 text-blue-700 rounded cursor-pointer" onClick={() => {
                     seteditcategorydata(
-                       {id:category._id,
+                      {
+                        id: category._id,
                         name: category.name,
-                      image: category.image}
+                        image: category.image
+                      }
                     )
                     setopenedit(true);
                   }}>
                     EDIT
                   </div>
-                  <div className="text-sm px-3 py-1 bg-red-200 text-red-700 rounded " onClick={()=>handledelete(category._id)}>
+                  <div className="text-sm px-3 py-1 bg-red-200 text-red-700 rounded " onClick={() => handledelete(category._id)}>
                     DELETE
                   </div>
                 </div>
@@ -94,16 +96,17 @@ const Category = () => {
 
 
       {openuploadcategory && (
-        <Uploadcategory
-          close={() => setopnenuploadcategory(false)}
-          // fetchcategory={fetchcategory}
-        />
+        <div className='fixed inset-0 bg-neutral-800 flex items-center justify-center p-4'> 
+          <Uploadcategory
+            close={() => setopnenuploadcategory(false)}
+          />
+        </div>
       )}
       {
         openedit && (
-           <Editcategory close={() => setopenedit(false)} editcategorydata={editcategorydata}
-          //  fetchcategory={fetchcategory}
-           ></Editcategory>
+          <Editcategory close={() => setopenedit(false)} editcategorydata={editcategorydata}
+
+          ></Editcategory>
         )
       }
     </section>

@@ -1,89 +1,166 @@
-import React, { useState } from 'react';
-
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { discountprice } from '../utils/discountprice';
+import currency from '../utils/currency';
+import Divider from '../components/divider';
+import Addaddress from '../components/addaddress';
+import AxiosToastError from '../utils/AxiosToastError';
+import Axios from '../utils/Axios';
+import summaryapi from '../common/summaryapi';
+import { setcartitems } from '../store/cartslice';
+import toast from 'react-hot-toast';
+import {useNavigate} from 'react-router-dom'
 const Checkout = () => {
-  const [addresses, setAddresses] = useState(['123 Main St, City, State, ZIP', '456 Elm St, City, State, ZIP']);
-  const [selectedAddress, setSelectedAddress] = useState(addresses[0]);
-  const [newAddress, setNewAddress] = useState('');
-  const [addingNew, setAddingNew] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState('card');
+    const dispatch = useDispatch();
+    const navigate=useNavigate();
+    const cartItems = useSelector(state => state.cart.cartitems);
+    const addresses = useSelector(state => state.address.addresslist);
+    const [cartSize, setCartSize] = useState(0);
+    const [discountTotal, setDiscountTotal] = useState(0);
+    const [originalTotal, setOriginalTotal] = useState(0);
+    const [selectedAddress, setSelectedAddress] = useState(addresses[0] || {});
+    const [addingNew, setAddingNew] = useState(false);
+    const [paymentMethod, setPaymentMethod] = useState('card');
+   
+    useEffect(() => {
+        const discountedPrice = cartItems.reduce((prev, curr) =>
+            prev + (discountprice(curr.productId.price, curr.productId.discount) * curr.quantity), 0);
+        setDiscountTotal(discountedPrice);
 
-  return (
-    <section className='bg-gray-100 min-h-screen flex justify-center items-center p-6'>
-      <div className='bg-white p-6 rounded-lg shadow-lg max-w-lg w-full'>
-        <h1 className='text-2xl font-semibold mb-4 text-center'>Checkout</h1>
-        <form className='space-y-4'>
-          <div>
-            <label className='block text-sm font-medium text-gray-700'>Full Name</label>
-            <input type='text' className='w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200 focus:outline-none' placeholder='John Doe'/>
-          </div>
-          <div>
-            <label className='block text-sm font-medium text-gray-700'>Email</label>
-            <input type='email' className='w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200 focus:outline-none' placeholder='example@mail.com'/>
-          </div>
-          <div>
-            <label className='block text-sm font-medium text-gray-700'>Address</label>
-            <select className='w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200 focus:outline-none' value={selectedAddress} onChange={(e) => setSelectedAddress(e.target.value)}>
-              {addresses.map((address, index) => (
-                <option key={index} value={address}>{address}</option>
-              ))}
-            </select>
-            <button type='button' className='text-blue-500 text-sm mt-2' onClick={() => setAddingNew(!addingNew)}>
-              {addingNew ? 'Cancel' : 'Add New Address'}
-            </button>
-            {addingNew && (
-              <div className='mt-2'>
-                <textarea className='w-full p-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200 focus:outline-none' 
-                  placeholder='New Address'
-                  value={newAddress}
-                  onChange={(e) => setNewAddress(e.target.value)}
-                ></textarea>
-                <button type='button' className='mt-2 bg-green-500 text-white px-3 py-1 rounded-lg' onClick={() => {
-                  setAddresses([...addresses, newAddress]);
-                  setSelectedAddress(newAddress);
-                  setNewAddress('');
-                  setAddingNew(false);
-                }}>
-                  Save Address
+        const totalPrice = cartItems.reduce((prev, curr) =>
+            prev + (curr.productId.price * curr.quantity), 0);
+        setOriginalTotal(totalPrice);
+
+        const size = cartItems.reduce((prev, curr) => prev + curr.quantity, 0);
+        setCartSize(size);
+    }, [cartItems]);
+
+    const handleSubmit =  async(e) => {
+        e.preventDefault();
+       try {
+        if(paymentMethod === 'cod'){
+            const res=await Axios({
+                ...summaryapi.cashondelivery,
+                data:{
+                    list:cartItems,
+                    quantity:cartSize,
+                    subtotalamt:discountTotal,
+                    totalamt:discountTotal,
+                    addressid:selectedAddress._id
+                }
+            })
+            if(res.data.success){
+                toast.success(res.data.message);
+                dispatch(setcartitems([]));
+                navigate('/')
+            }
+          
+        }
+        
+       } catch (error) {
+        console.log(error);
+        AxiosToastError(error)
+       }
+    }
+
+    return (
+        <section className='max-h-screen grid grid-cols-2 p-6 gap-6'>
+            <div className='bg-white p-6 rounded-lg shadow-lg'>
+                <h2 className='text-xl font-semibold mb-4'>Select Address</h2>
+                <div className='border border-gray-300 rounded-lg p-3'>
+                    {addresses.length === 0 ? (
+                        <p className='text-gray-500'>No addresses found</p>
+                    ) : (
+                        addresses.map((address, index) => (
+                            <label
+                                key={index}
+                                className='flex flex-col space-y-1 p-2 cursor-pointer hover:bg-gray-100 rounded-lg'
+                            >
+                                <div className='flex items-center space-x-2'>
+                                    <input
+                                        type='radio'
+                                        name='address'
+                                        className='w-5 h-5 accent-blue-500'
+                                        checked={selectedAddress?.address_line === address.address_line}
+                                        onChange={() => setSelectedAddress(address)}
+                                    />
+                                    <span className='text-gray-800 font-semibold'>{address.address_line}</span>
+                                </div>
+                                <div className='text-gray-600 text-sm pl-7'>
+                                    <p>{address.city}, {address.state}, {address.zip_code}</p>
+                                    <p>{address.country}</p>
+                                    <p>{address.phone}</p>
+                                </div>
+                            </label>
+                        ))
+                    )}
+                </div>
+                <button type='button' className='text-blue-500 text-sm mt-2' onClick={() => setAddingNew(!addingNew)}>
+                    {addingNew ? 'Cancel' : 'Add New Address'}
                 </button>
-              </div>
-            )}
-          </div>
-          <div>
-            <label className='block text-sm font-medium text-gray-700'>Payment Method</label>
-            <div className='flex gap-4 mt-2'>
-              <label className='flex items-center gap-2'>
-                <input 
-                  type='radio' 
-                  name='payment' 
-                  value='card' 
-                  checked={paymentMethod === 'card'} 
-                  onChange={() => setPaymentMethod('card')} 
-                />
-                Card Payment
-              </label>
-              <label className='flex items-center gap-2'>
-                <input 
-                  type='radio' 
-                  name='payment' 
-                  value='cod' 
-                  checked={paymentMethod === 'cod'} 
-                  onChange={() => setPaymentMethod('cod')} 
-                />
-                Cash on Delivery
-              </label>
+                {addingNew && <Addaddress close={() => setAddingNew(false)} />}
             </div>
-          </div>
-          {paymentMethod === 'card' && (
-            <div>
-              <label className='block text-sm font-medium text-gray-700'>Card Details</label>
-              <input type='text' className='w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200 focus:outline-none' placeholder='**** **** **** ****'/>
+
+            <div className='bg-white p-6 rounded-lg shadow-lg'>
+                <h2 className='text-xl font-semibold mb-4'>Order Summary</h2>
+                <Divider />
+                <div className="p-4">
+                    <div className="flex justify-between text-gray-700 text-lg">
+                        <span>Items</span>
+                        <span>{cartSize}</span>
+                    </div>
+                    <div className="flex justify-between text-gray-700 text-lg">
+                        <span>Original Price:</span>
+                        <span className="line-through">{currency(originalTotal)}</span>
+                    </div>
+                    <div className="flex justify-between text-green-600 text-lg font-semibold">
+                        <span>Discounted Price:</span>
+                        <span>{currency(discountTotal)}</span>
+                    </div>
+                    <div className="flex justify-between text-gray-700 text-lg">
+                        <span>Delivery charges:</span>
+                        <span>Free</span>
+                    </div>
+                </div>
+                <Divider />
+
+                <h2 className='text-xl font-semibold mb-4'>Select Payment Method</h2>
+                <div className='flex gap-4 mb-4'>
+                    <button 
+                        className={`px-4 py-2 rounded-lg transition-all ${
+                            paymentMethod === 'card' 
+                            ? 'bg-blue-600 text-white' 
+                            : 'bg-gray-200 text-gray-700'
+                        }`} 
+                        onClick={() => setPaymentMethod('card')}
+                    >
+                        Card Payment
+                    </button>
+                    <button 
+                        className={`px-4 py-2 rounded-lg transition-all ${
+                            paymentMethod === 'cod' 
+                            ? 'bg-blue-600 text-white' 
+                            : 'bg-gray-200 text-gray-700'
+                        }`} 
+                        onClick={() => setPaymentMethod('cod')}
+                    >
+                        Cash on Delivery
+                    </button>
+                </div>
+
+                {paymentMethod === 'card' && (
+                    <div>
+                        <label className='block text-sm font-medium text-gray-700'>Card Details</label>
+                        <input type='text' className='w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200 focus:outline-none' placeholder='**** **** **** ****'/>
+                    </div>
+                )}
+
+                <button  onClick={handleSubmit} className='w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-all mt-4'>
+                    Place Order
+                </button>
             </div>
-          )}
-          <button type='submit' className='w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-all'>Place Order</button>
-        </form>
-      </div>
-    </section>
-  );
+        </section>
+    );
 };
 
 export default Checkout;

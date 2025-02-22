@@ -7,11 +7,11 @@ const Productcardadmin = ({ product }) => {
     const [edit, setedit] = useState(false)
     const handledelete = async (id) => {
         try {
-           const res=await Axios({
-            ...summaryapi.deleteproduct,
-            data:{id}
-           })
-            if(res.data.success) {
+            const res = await Axios({
+                ...summaryapi.deleteproduct,
+                data: { id }
+            })
+            if (res.data.success) {
                 toastr.success("Successfully deleted")
             }
         } catch (error) {
@@ -38,11 +38,14 @@ const Productcardadmin = ({ product }) => {
                     onClick={() => setedit(true)}                >
                     EDIT
                 </div>
-                <div className="text-sm px-3 py-1 bg-red-200 text-red-700 rounded " onClick={()=>handledelete(product._id)}>
+                <div className="text-sm px-3 py-1 bg-red-200 text-red-700 rounded " onClick={() => handledelete(product._id)}>
                     DELETE
                 </div>
             </div>
-            {edit && <Editproductadmin product={product} close={() => setedit(false)}></Editproductadmin>}
+            {edit &&
+                <div className='fixed top-0 right-0 bottom-0 left-0 bg-black z-50 bg-opacity-70 p-4'>
+                    <Editproductadmin product={product} close={() => setedit(false)}></Editproductadmin>
+                </div>}
         </div>
     )
 }

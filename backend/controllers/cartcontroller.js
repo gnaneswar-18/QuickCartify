@@ -5,6 +5,11 @@ import ProductModel from '../models/productmodel.js';
 const addToCartController = async (req, res) => {
     try {
         const userId = req.userId;
+        if(!userId) return res.json({
+            message: "login is required",
+            error: true,
+            success: false,
+        })
         const { productId } = req.body;
 
         if (!productId) {

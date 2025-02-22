@@ -5,13 +5,15 @@ import Header from './components/header.jsx'
 import Footer from './components/footer.jsx'
 import fetchUserDetails from './utils/fetchuserdetails.js'
 import { setUserDetail } from './store/userslice.js';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setAllCategory, setAllProduct } from './store/productslice.js';
 import Axios from './utils/Axios.jsx';
 import summaryapi from './common/summaryapi.js';
 import { setcartitems } from './store/cartslice.js';
+import { setAddressList } from './store/addressslice.js';
 
 const App = () => {
+  const user=useSelector(state=>state.user)
   const dispatch = useDispatch();
 
   const fetchProduct = async () => {
@@ -51,13 +53,23 @@ const App = () => {
     const userData = await fetchUserDetails();
     dispatch(setUserDetail(userData?.data));
   };
-
+  const fetchaddreslist = async () => {
+    try {
+      const response = await Axios({...summaryapi.getaddress });
+      if (response?.data?.success) {
+        dispatch(setAddressList(response.data.data));
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
   useEffect(() => {
     fetchUser();
     fetchCategory();
     fetchProduct();
     fetchCartDetails();
-  }, []);
+    fetchaddreslist()
+  }, [user]);
 
   return (
     <div className="flex flex-col min-h-screen relative">

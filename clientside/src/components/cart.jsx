@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { FaCartPlus } from "react-icons/fa6";
 import { IoMdClose } from "react-icons/io";
-import {  useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { discountprice } from '../utils/discountprice';
 import currency from '../utils/currency';
 import { setcartitems } from '../store/cartslice';
@@ -14,10 +14,10 @@ import { MdDelete } from "react-icons/md";
 import Divider from './divider';
 
 const Cart = ({ close }) => {
-    const navigate=useNavigate()
+    const navigate = useNavigate()
     const dispatch = useDispatch();
     const cartItems = useSelector(state => state.cart.cartitems);
-    const user=useSelector(state => state.user)
+    const user = useSelector(state => state.user)
     const [cartSize, setCartSize] = useState(0);
     const [discountTotal, setDiscountTotal] = useState(0);
     const [originalTotal, setOriginalTotal] = useState(0);
@@ -25,8 +25,7 @@ const Cart = ({ close }) => {
     const clearCart = async (e) => {
         e.preventDefault();
         e.stopPropagation();
-        console.log('clear')
-        if (cartItems.length === 0) {
+        if (cartSize === 0) {
             toast.error("Cart is already empty!");
             return;
         }
@@ -34,11 +33,11 @@ const Cart = ({ close }) => {
             const response = await Axios({ ...summaryapi.clearcartitem });
             if (response?.data?.success) {
                 dispatch(setcartitems([]));
-                toast.success("Cart cleared successfully!");
+                toast.success("Cart cleared successfully!",{position: 'bottom-left'});
             }
         } catch (error) {
-            console.log(error);
-           AxiosToastError(error);
+          
+            AxiosToastError(error.message);
         }
     };
     const fetchCartDetails = async () => {
@@ -48,27 +47,27 @@ const Cart = ({ close }) => {
                 dispatch(setcartitems(response.data.data));
             }
         } catch (error) {
-            console.log(error);
+            console.log(error.message);
         }
     };
-    const deletecartitem=async(cartid)=>{
-        try{
-            const response=await Axios({
+    const deletecartitem = async (cartid) => {
+        try {
+            const response = await Axios({
                 ...summaryapi.deletecartitem,
-                data:{id: cartid}
+                data: { id: cartid }
             });
-            if(response.data.success){
+            if (response.data.success) {
                 toast.success(response.data.message)
                 await fetchCartDetails()
             }
-        }catch(error){
+        } catch (error) {
             AxiosToastError(error)
         }
 
     }
-    const handlecheckout =  () => {
-      if(user._id)navigate('/checkout');
-      else toast("Please login to proceed with checkout!")
+    const handlecheckout = () => {
+        if (user._id) navigate('/checkout');
+        else toast("Please login to proceed with checkout!")
     }
     useEffect(() => {
         const discountedPrice = (cartItems || []).reduce((prev, curr) =>
@@ -99,30 +98,31 @@ const Cart = ({ close }) => {
                     {cartItems.length > 0 ? (
                         cartItems.map(item => (
                             <>
-                            <div key={item._id} className="flex items-center gap-4 py-3">
-                                <img src={item.productId.image[0].url} alt={item.productId.name} className="w-14 h-14 object-cover rounded" />
-                                <div className="flex-1">
-                                    <p className="font-medium">{item.productId.name}</p>
-                                    <p className="text-sm text-gray-500">
-                                        {currency(discountprice(item.productId.price, item.productId.discount))} x {item.quantity}
+                                <div key={item._id} className="flex items-center gap-4 py-3">
+                                    <img src={item.productId.image[0].url} alt={item.productId.name} className="w-14 h-14 object-cover rounded" />
+                                    <div className="flex-1">
+                                        <p className="font-medium">{item.productId.name}</p>
+                                        <p className="text-sm text-gray-500">
+                                            {currency(discountprice(item.productId.price, item.productId.discount))} x {item.quantity}
+                                        </p>
+                                    </div>
+                                    <p className="font-semibold text-gray-700">
+                                        {currency(discountprice(item.productId.price, item.productId.discount) * item.quantity)}
                                     </p>
+                                    <button
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation()
+                                            deletecartitem(item._id)
+                                        }}
+                                        className="text-gray-700 text-sm ">
+                                        <MdDelete size={20} color='red' />
+                                    </button>
+
                                 </div>
-                                <p className="font-semibold text-gray-700">
-                                    {currency(discountprice(item.productId.price, item.productId.discount) * item.quantity)}
-                                </p>
-                                <button
-                                    onClick={(e) =>{ 
-                                        e.preventDefault();
-                                        e.stopPropagation()
-                                        deletecartitem(item._id)}}
-                                    className="text-gray-700 text-sm ">
-                                    <MdDelete size={20} color='red'/>
-                                </button>
-                               
-                            </div>
-                             <Divider></Divider>
-                             </>
-                            
+                                <Divider></Divider>
+                            </>
+
                         ))
                     ) : (
                         <p className="text-center text-gray-500 mt-10">Your cart is empty</p>
@@ -130,7 +130,7 @@ const Cart = ({ close }) => {
                 </div>
 
                 <div className="p-4 border-t bg-gray-100">
-                <div className="flex justify-between text-gray-700 text-lg">
+                    <div className="flex justify-between text-gray-700 text-lg">
                         <span>Items</span>
                         <span>{cartSize}</span>
                     </div>
@@ -142,7 +142,7 @@ const Cart = ({ close }) => {
                         <span>Discounted Price:</span>
                         <span>{currency(discountTotal)}</span>
                     </div>
-    
+
                     <div className="flex justify-between text-gray-700 text-lg">
                         <span>Delivery charges:</span>
                         <span>Free</span>
@@ -151,14 +151,18 @@ const Cart = ({ close }) => {
                         <button
                             onClick={clearCart}
                             className={`flex-1 py-2 rounded transition ${cartItems.length > 0
-                                    ? "bg-red-500 text-white hover:bg-red-600"
-                                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                ? "bg-red-500 text-white hover:bg-red-600"
+                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
                                 }`}
                             disabled={cartItems.length === 0}
                         >
                             Clear Cart
                         </button>
-                        <button onClick={handlecheckout} className="flex-1 bg-blue-600 text-white text-center py-2 rounded hover:bg-blue-700 transition">
+                        <button onClick={handlecheckout} className={`flex-1 py-2 rounded transition ${cartItems.length > 0
+                                ? "bg-blue-500 text-white hover:bg-blue-600"
+                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                }`}
+                            disabled={cartItems.length === 0}>
                             Checkout
                         </button>
                     </div>

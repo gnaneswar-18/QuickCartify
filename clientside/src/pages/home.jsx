@@ -6,7 +6,7 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import Productinfo from "./productinfo";
+import Productinfo from "./productinfo.jsx";
 
 
 const Home = () => {

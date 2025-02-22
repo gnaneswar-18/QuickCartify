@@ -29,7 +29,7 @@ const ProductAdmin = () => {
 
     return (
         <section className=" overflow-y-auto " style={{ maxHeight: "80vh" }}>
-            <div className="z-100 p-3 bg-white shadow flex justify-between items-center sticky top-0   ">
+            <div className=" p-3 bg-white shadow flex justify-between items-center sticky top-0   ">
                 <h2 className="text-lg font-semibold">PRODUCTS</h2>
                 <div className="flex items-center gap-4  border-2 border-gray-300 rounded focus-within:border-primary-light p-2 ">
                 <IoSearch size={20} />
@@ -47,7 +47,7 @@ const ProductAdmin = () => {
                 { displayedProducts.length === 0 ? (
                     <p className="p-4 text-center text-gray-500">No products found.</p>
                 ) : (
-                <div className="flex flex-wrap overflow-y-hidden gap-6 m-5  ">
+                <div className="flex flex-wrap overflow-y-hidden gap-6 m-5 b ">
                     {displayedProducts.map((product,index) => (
                      <Productcardadmin product={product}></Productcardadmin>
                     ))}

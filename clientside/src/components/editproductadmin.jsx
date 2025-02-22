@@ -96,7 +96,7 @@ const Editproductadmin = ({ product, close }) => {
     }
 
     return (
-        <div className='fixed top-0 right-0 bottom-0 left-0 bg-black z-50 bg-opacity-70 p-4'>
+
             <div className='bg-white w-full  max-w-3xl mx-auto rounded p-4'>
                 <section className=" overflow-y-auto scrollbar " style={{ maxHeight: "90vh" }}>
                     <div className="z-100 p-4 bg-white flex justify-between items-center">
@@ -262,7 +262,7 @@ const Editproductadmin = ({ product, close }) => {
                     </div>
                 </section>
             </div>
-        </div>
+       
     )
 }
 

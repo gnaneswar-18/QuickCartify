@@ -38,7 +38,7 @@ const Productdisplay = ({ id }) => {
       ) : data.length === 0 ? (
         <p className="text-gray-500">No products available</p>
       ) : (
-        <div className="flex gap-4 overflow-x-auto max-h-72 p-2 scrollbar">
+        <div className="flex gap-4 overflow-x-auto max-h-72 min-h-60 p-2 scrollbar">
           {data.map((product) => (
              <Card product={product} key={product._id}></Card>
           ))}

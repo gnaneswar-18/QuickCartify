@@ -24,13 +24,13 @@ const addressSchema=new moongose.Schema({
         type:Number,
         default:null
     },
-    state:{
-        type:Boolean,
-        default:true
+    userId:{
+        type: moongose.Schema.Types.ObjectId,
+        ref: "User"
     }
 },{
     timestamps:true
 })
 
-const AddressModel=mongoose.model('Address',addressSchema)
+const AddressModel=moongose.model('Address',addressSchema)
 export default AddressModel;

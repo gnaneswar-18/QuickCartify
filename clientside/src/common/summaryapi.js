@@ -1,3 +1,5 @@
+import Addaddress from "../components/addaddress"
+
 export const baseUrl = "http://localhost:8080"
 const summaryapi = {
     register: {
@@ -104,6 +106,22 @@ const summaryapi = {
     clearcartitem:{
         url:'/api/cart/clear',
         method:"delete"
+    },
+    addaddress:{
+          url:'/api/address/add',
+          method:"post"
+    },
+    getaddress:{
+        url:'/api/address/get',
+        method:"get"
+    },
+    deleteaddress:{
+        url:'/api/address/delete',
+        method:"delete"
+    },
+    cashondelivery:{
+        url:'/api/order/cash',
+        method:"post"
     }
 
 }

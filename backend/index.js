@@ -9,6 +9,8 @@ import categoryRouter from './routes/categoryroute.js'
 import uploadRouter from './routes/uploadroute.js'
 import productRouter from './routes/productroute.js'
 import cartRouter from './routes/cartroute.js'
+import addressRouter from './routes/addressroute.js'
+import orderRouter from './routes/orderroute.js'
 const app = express()
 
 dotenv.config()
@@ -33,6 +35,8 @@ app.use('/api/category',categoryRouter)
 app.use('/api/file',uploadRouter)
 app.use('/api/product',productRouter)
 app.use('/api/cart',cartRouter)
+app.use('/api/address',addressRouter)
+app.use('/api/order',orderRouter)
 app.listen(port,()=>{
     connectToMongoose()
     console.log(`Server is running on port ${port}`)

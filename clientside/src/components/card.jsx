@@ -28,7 +28,7 @@ const Card = ({ product }) => {
                 <div className='w-fit  bg-blue-50 p-2'>
                     {currency(product.price)}
                 </div>
-                <div>
+                <div >
                     {
                         product.stock == 0 ? (
                             <p className='tex-sm  text-center text-red-400'>out of stock</p>
