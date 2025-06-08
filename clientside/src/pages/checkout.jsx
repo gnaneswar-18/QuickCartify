@@ -9,10 +9,11 @@ import Axios from '../utils/Axios';
 import summaryapi from '../common/summaryapi';
 import { setcartitems } from '../store/cartslice';
 import toast from 'react-hot-toast';
-import {useNavigate} from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import {loadStripe} from '@stripe/stripe-js'
 const Checkout = () => {
     const dispatch = useDispatch();
-    const navigate=useNavigate();
+    const navigate = useNavigate();
     const cartItems = useSelector(state => state.cart.cartitems);
     const addresses = useSelector(state => state.address.addresslist);
     const [cartSize, setCartSize] = useState(0);
@@ -21,7 +22,7 @@ const Checkout = () => {
     const [selectedAddress, setSelectedAddress] = useState(addresses[0] || {});
     const [addingNew, setAddingNew] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState('card');
-   
+
     useEffect(() => {
         const discountedPrice = cartItems.reduce((prev, curr) =>
             prev + (discountprice(curr.productId.price, curr.productId.discount) * curr.quantity), 0);
@@ -35,33 +36,75 @@ const Checkout = () => {
         setCartSize(size);
     }, [cartItems]);
 
-    const handleSubmit =  async(e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-       try {
-        if(paymentMethod === 'cod'){
-            const res=await Axios({
-                ...summaryapi.cashondelivery,
-                data:{
-                    list:cartItems,
-                    quantity:cartSize,
-                    subtotalamt:discountTotal,
-                    totalamt:discountTotal,
-                    addressid:selectedAddress._id
-                }
-            })
-            if(res.data.success){
-                toast.success(res.data.message);
-                dispatch(setcartitems([]));
-                navigate('/')
+        try {
+            if (!selectedAddress._id) {
+                return toast.error("Please select an address before proceeding.");
             }
-          
+    
+            if (paymentMethod === 'cod') {
+                // Cash on Delivery API Call
+                const res = await Axios({
+                    ...summaryapi.cashondelivery,
+                    data: {
+                        list: cartItems,
+                        quantity: cartSize,
+                        subtotalamt: discountTotal,
+                        totalamt: discountTotal,
+                        addressid: selectedAddress._id
+                    }
+                });
+    
+                if (res.data.success) {
+                    toast.success(res.data.message);
+                    dispatch(setcartitems([]));
+                    navigate('/');
+                } else {
+                    toast.error("Failed to place COD order.");
+                }
+    
+            } else {
+                
+                const stripePublicKey = "pk_test_51R1meuJCKhh6YSV0CrFWJIB5GQ5dRUjvZx6I235vMxpJxYoqYFU9gwXq15DgWwVG6KH8tbQXMaSHQqC5rSLZPffr00DOIj5wDp";
+                const stripe = await loadStripe(stripePublicKey);
+    
+                if (!stripe) {
+                    return toast.error("Failed to load Stripe. Please try again.");
+                }
+    
+                const res = await Axios({
+                    ...summaryapi.payonline,
+                    data: {
+                        list: cartItems,
+                        quantity: cartSize,
+                        subtotalamt: discountTotal,
+                        totalamt: discountTotal,
+                        addressid: selectedAddress._id
+                    }
+                });
+    
+                if (res.data.success && res.data.id) {
+                    toast.success("Redirecting to payment...");
+                    const result = await stripe.redirectToCheckout({ sessionId: res.id });
+    
+                    if (result.error) {
+                        console.error("Stripe Checkout Error:", result.error);
+                        toast.error(result.error.message);
+                    } else {
+                        dispatch(setcartitems([]));
+                    }
+                } else {
+
+                    toast.error("Payment initiation failed. Please try again.");
+                }
+            }
+        } catch (error) {
+            console.error("Payment Error:", error);
+            AxiosToastError(error);
         }
-        
-       } catch (error) {
-        console.log(error);
-        AxiosToastError(error)
-       }
-    }
+    };
+    
 
     return (
         <section className='max-h-screen grid grid-cols-2 p-6 gap-6'>
@@ -126,36 +169,28 @@ const Checkout = () => {
 
                 <h2 className='text-xl font-semibold mb-4'>Select Payment Method</h2>
                 <div className='flex gap-4 mb-4'>
-                    <button 
-                        className={`px-4 py-2 rounded-lg transition-all ${
-                            paymentMethod === 'card' 
-                            ? 'bg-blue-600 text-white' 
+                    <button
+                        className={`px-4 py-2 rounded-lg transition-all ${paymentMethod === 'card'
+                            ? 'bg-blue-600 text-white'
                             : 'bg-gray-200 text-gray-700'
-                        }`} 
+                            }`}
                         onClick={() => setPaymentMethod('card')}
                     >
                         Card Payment
                     </button>
-                    <button 
-                        className={`px-4 py-2 rounded-lg transition-all ${
-                            paymentMethod === 'cod' 
-                            ? 'bg-blue-600 text-white' 
+                    <button
+                        className={`px-4 py-2 rounded-lg transition-all ${paymentMethod === 'cod'
+                            ? 'bg-blue-600 text-white'
                             : 'bg-gray-200 text-gray-700'
-                        }`} 
+                            }`}
                         onClick={() => setPaymentMethod('cod')}
                     >
                         Cash on Delivery
                     </button>
                 </div>
 
-                {paymentMethod === 'card' && (
-                    <div>
-                        <label className='block text-sm font-medium text-gray-700'>Card Details</label>
-                        <input type='text' className='w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200 focus:outline-none' placeholder='**** **** **** ****'/>
-                    </div>
-                )}
 
-                <button  onClick={handleSubmit} className='w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-all mt-4'>
+                <button onClick={handleSubmit} className='w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-all mt-4'>
                     Place Order
                 </button>
             </div>

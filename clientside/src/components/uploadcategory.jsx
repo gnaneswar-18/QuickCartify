@@ -25,7 +25,6 @@ const UploadCategory = ({ close, fetchcategory }) => {
       if (response.data.success) {
         toast.success("Successfully added category");
         close();
-        // fetchcategory();
       }
     } catch (error) {
       AxiosToastError(error);

@@ -18,6 +18,8 @@ import ProductAdmin from '../pages/productAdmin.jsx'
 import Productlist from '../pages/productlist.jsx'
 import Productdisplay from '../pages/Productdisplay.jsx'
 import Checkout from '../pages/checkout.jsx'
+import CancelOrder from '../pages/cancel.jsx'
+import SuccessPage from '../pages/success.jsx'
 const router = createBrowserRouter([
     {
         path: '/',
@@ -81,7 +83,15 @@ const router = createBrowserRouter([
             },{
                 path:'/checkout',
                 element:<Checkout/>
+            },{
+                path:'/cancel',
+                element:< CancelOrder/>
+            },{
+                path:'/success',
+                element:< SuccessPage/>
             }
+
+
         ]
     }
 ])

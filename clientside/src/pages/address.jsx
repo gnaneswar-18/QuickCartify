@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { FaTrash } from 'react-icons/fa';
 import AxiosToastError from '../utils/AxiosToastError';
 import Axios from '../utils/Axios';
-import { setAddressList } from '../store/addressSlice.js';
+import { setAddressList } from '../store/addressslice.js';
 import summaryapi from '../common/summaryapi';
 
 const Address = () => {

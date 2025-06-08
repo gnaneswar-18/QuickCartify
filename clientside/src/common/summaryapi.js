@@ -1,4 +1,4 @@
-import Addaddress from "../components/addaddress"
+import Addaddress from "../components/addaddress.jsx"
 
 export const baseUrl = "http://localhost:8080"
 const summaryapi = {
@@ -121,6 +121,10 @@ const summaryapi = {
     },
     cashondelivery:{
         url:'/api/order/cash',
+        method:"post"
+    }, 
+    payonline:{
+        url:'/api/order/pay',
         method:"post"
     }
 
