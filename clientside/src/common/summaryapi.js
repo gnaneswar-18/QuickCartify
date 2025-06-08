@@ -1,6 +1,4 @@
-import Addaddress from "../components/addaddress.jsx"
-
-export const baseUrl = "http://localhost:8080"
+export const baseUrl = "https://quick-cartify-w9tg.vercel.app/"
 const summaryapi = {
     register: {
         url: '/api/user/register',
