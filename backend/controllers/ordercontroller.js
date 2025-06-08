@@ -52,5 +52,67 @@ const cashOnDeliveryController = async (req, res) => {
         });
     }
 };
+export const discountprice = (price, dis = 1) => {
+    return Math.floor(Number(price) - (Number(price) * Math.abs(Number(dis))) / 100)
+}
+const paymentDeliveryController = async (req, res) => {
+    
+    try {
+        const userId = req.userId;
+        if (!userId) {
+            return res.status(400).json({ message: "User ID is required", error: true, success: false });
+        }
+        const user=UserModel.findById(userId);
 
-export { cashOnDeliveryController };
+        const { list, subtotalamt, totalamt, addressid } = req.body;
+
+        const lists = list.map(items => {
+            return {
+                price_data: {
+                    currency: "inr",
+                    product_data: {
+                        name: items.productId.name,
+                        images: [items.productId.image],
+                        metadata: {
+                            productId: items.productId._id
+                        }
+                    },
+                    unit_amount: discountprice(items.productId.price, items.productId.discount)*100
+                },
+                adjustable_quantity: {
+                    enabled:true,
+                    minimum:1
+                },
+                quantity:items.quantity
+
+            }
+        })
+        const params={
+            submit_type:"pay",
+            mode:"payment",
+            payment_method_types:["card"],
+            customer_email:user.email,
+            metadata:{
+                userId:userId,
+                addressId:addressid
+            },
+            line_items:lists,
+            success_url: `${process.env.FRONTEND_URL}/success`,
+            cancel_url: `${process.env.FRONTEND_URL}/cancel`,
+            
+        }
+
+        const session=await stripe.checkout.sessions.create(params)
+        console.log(session);
+        return res.status(202).json(
+        session)
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message || "Server error",
+            error: true,
+            success: false,
+        })
+    }
+}
+
+export { cashOnDeliveryController ,paymentDeliveryController};
