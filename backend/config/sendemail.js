@@ -25,3 +25,6 @@ const sendEmail = async ({ sendTo, subject, html }) => {
 }
 export default sendEmail;
 
+// This code is for sending emails using the Resend service.
+// It initializes the Resend client with an API key from environment variables,
+// and defines a function to send emails with the specified parameters.
