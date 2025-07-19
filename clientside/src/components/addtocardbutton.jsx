@@ -40,7 +40,8 @@ const AddToCartButton = ({ data }) => {
                 toast.success("Added to cart");
             }
         } catch (error) {
-            AxiosToastError(error.message);
+            console.log(error);
+            AxiosToastError(error);
         } finally {
             setLoading(false);
         }

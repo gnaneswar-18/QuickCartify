@@ -36,8 +36,7 @@ const Cart = ({ close }) => {
                 toast.success("Cart cleared successfully!",{position: 'bottom-left'});
             }
         } catch (error) {
-          
-            AxiosToastError(error.message);
+            AxiosToastError(error);
         }
     };
     const fetchCartDetails = async () => {

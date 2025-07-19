@@ -25,6 +25,7 @@ const login = () => {
         ...summaryapi.login,
         data: data
       })
+      console.log(response);
       if (response.data.error) {
         AxiosToastError(response.data.error);
       }
@@ -41,7 +42,7 @@ const login = () => {
       }
       navigate("/")
     } catch (err) {
-      AxiosToastError(err)
+      AxiosToastError(err.message)
     }
 
   }

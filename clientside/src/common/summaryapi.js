@@ -1,4 +1,6 @@
-export const baseUrl = "https://quick-cartify-w9tg.vercel.app/"
+// export const baseUrl = "https://quick-cartify-w9tg.vercel.app/"
+export const baseUrl = "http://localhost:8080"
+// export const baseUrl = process.env.BACKEND_URL
 const summaryapi = {
     register: {
         url: '/api/user/register',

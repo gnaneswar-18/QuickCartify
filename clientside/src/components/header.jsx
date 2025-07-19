@@ -8,7 +8,6 @@ import { useSelector } from 'react-redux';
 import currency from '../utils/currency.jsx'
 import {discountprice} from '../utils/discountprice.jsx'
 import Cart from './cart.jsx';
-
 const Header = () => {
   const user = useSelector(state => state.user);
   const [openusermenu, setusermenu] = useState(false);
@@ -41,7 +40,7 @@ const Header = () => {
         <Link to={"/"} className="h-full px-4 ">
           <img
 
-            src="https://res-console.cloudinary.com/dlbwjhoid/media_explorer_thumbnails/598ff56b0a0bf200135c8fd34126c124/detailed"
+            src={import.meta.env.VITE_LOGO_URL}
             alt="logo"
             className="h-full w-48 object-contain"
           />

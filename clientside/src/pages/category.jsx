@@ -35,6 +35,7 @@ const Category = () => {
         toast.success(response.data.message);
       }
     } catch (error) {
+      console.error(error);
       AxiosToastError(error)
     }
   }

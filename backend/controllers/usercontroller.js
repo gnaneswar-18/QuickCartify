@@ -79,7 +79,9 @@ const verifyEmailController = async (req, res) => {
 }
 const loginController = async (req, res) => {
     try {
+        console.log(req.body);
         const { email, password } = req.body
+        // console.log(email, password);
         const user = await Usermodel.findOne({ email })
 
         if (!user) {

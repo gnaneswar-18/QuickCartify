@@ -64,11 +64,13 @@ const updateCategoryController = async (req, res) => {
 const deleteCategoryController = async (req, res) => {
     try {
         const { id } = req.body;
+        
         const checkproduct = await ProductModel.find({
             category: {
                 "$in": [id]
             }
         }).countDocuments()
+        console.log(checkproduct);
         if (checkproduct > 0 ) {
             return res.status(400).json({
                 message: "Cannot delete category, it contains subcategories or products",
@@ -77,8 +79,9 @@ const deleteCategoryController = async (req, res) => {
             })
         }
         const category = await categoryModel.findById({_id: id})
+        console.log(category);
         const imageid=category.image;
-        const deleteimage=await deleteImageCloudinary(imageid);
+        await deleteImageCloudinary(imageid);
         const deleteCategory = await categoryModel.deleteOne({ _id: id });
         return res.status(200).json({
             message: "Category deleted successfully",
@@ -87,6 +90,7 @@ const deleteCategoryController = async (req, res) => {
             error: false
         })
     } catch (error) {
+        
         return res.status(500).json({ message: error.message || error, success: false, error: true });
     }
 }

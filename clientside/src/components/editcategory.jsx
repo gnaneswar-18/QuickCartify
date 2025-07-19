@@ -4,6 +4,7 @@ import { IoMdClose } from "react-icons/io";
 import summaryapi from '../common/summaryapi';
 import toast from 'react-hot-toast';
 import AxiosToastError from '../utils/AxiosToastError';
+import uploadimage from '../utils/uploadimage.jsx';
 const Editcategory = ({ close, editcategorydata }) => {
   const [loading, setloading] = useState(false);
     const [data, setdata] = useState({
