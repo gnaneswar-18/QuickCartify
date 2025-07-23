@@ -16,7 +16,7 @@ const app = express()
 dotenv.config()
 app.use(cors({
     credentials:true,
-    origin:"http://localhost:5173"
+    origin:import.meta.env.VITE_FRONTEND_URL
 }))
 app.use(express.json())
 app.use(cookieParser())
