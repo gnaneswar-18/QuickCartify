@@ -63,6 +63,7 @@ const App = () => {
       console.log(error);
     }
   }
+
   useEffect(() => {
     fetchUser();
     fetchCategory();

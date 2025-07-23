@@ -1,5 +1,6 @@
 // export const baseUrl = "https://quick-cartify-w9tg.vercel.app/"
-export const baseUrl = "http://localhost:8080"
+
+export const baseUrl =  import.meta.env.VITE_BACKEND_URL
 // export const baseUrl = process.env.BACKEND_URL
 const summaryapi = {
     register: {
@@ -126,6 +127,10 @@ const summaryapi = {
     payonline:{
         url:'/api/order/pay',
         method:"post"
+    },
+    getorders:{
+        url:'/api/order/getorders',
+        method:"get"
     }
 
 }

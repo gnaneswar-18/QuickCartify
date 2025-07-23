@@ -115,4 +115,34 @@ const paymentDeliveryController = async (req, res) => {
     }
 }
 
-export { cashOnDeliveryController ,paymentDeliveryController};
+
+const getOrderController = async (req, res) => {
+  try {
+    const userId = req.userId;
+    if (!userId) {
+      return res.status(400).json({ message: "User ID is required", error: true, success: false });
+    }
+
+    const orders = await orderModel.find({ userId }).sort({ createdAt: -1 });
+
+    if (!orders || orders.length === 0) {
+      return res.status(404).json({ message: "No orders found", error: true, success: false });
+    }
+
+    return res.status(200).json({
+      message: "Orders fetched successfully",
+      success: true,
+      data:orders
+    });
+  } catch (error) {
+    console.error("Error in getOrderController:", error);
+    return res.status(500).json({
+      message: error.message || "Server error",
+      error: true,
+      success: false,
+    });
+  }
+};
+
+
+export { cashOnDeliveryController ,paymentDeliveryController, getOrderController };

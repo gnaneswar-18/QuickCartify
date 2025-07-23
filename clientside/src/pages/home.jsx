@@ -15,7 +15,7 @@ const Home = () => {
   }
   return (
     <section>
-      <div className="flex flex-col md:flex-row items-center justify-between px-6 md:px-20 py-12 relative overflow-hidden">
+      <div className="flex flex-col md:flex-row items-center justify-between px-6 md:px-20 py-12 relative overflow-hidden  -z-10">
         <div className="flex-1 max-w-xl text-center md:text-left z-10">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-800 leading-tight mb-4">
             Fresh Food & Groceries <br />
@@ -45,7 +45,7 @@ const Home = () => {
           </div>
         </div>
 
-        <div className="flex-1 flex justify-center mt-12 md:mt-0 z-10">
+        <div className="flex-1 flex justify-center mt-12 md:mt-0">
           <img
             src={import.meta.env.VITE_HOME_IMG}
             alt="Food Bowl"
